@@ -9,6 +9,11 @@ export const Footer: React.FC = () => {
       <div className="max-w-7xl mx-auto px-4">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
           <div>
+            <img 
+              src="/footer.png" 
+              alt="Elite Machine Hire" 
+              className="h-16 w-auto mb-4"
+            />
             <h3 className="text-2xl font-bold text-[#EB8B1D] mb-4">Elite Machine Hire</h3>
             <p className="text-[#BFBFBF] text-sm">
               Supplying reliable machinery for projects big and small — across Adelaide & South Australia.
