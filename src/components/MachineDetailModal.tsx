@@ -21,43 +21,55 @@ export const MachineDetailModal: React.FC<MachineDetailModalProps> = ({ machine,
         <div className="p-6 space-y-6 max-h-[70vh] overflow-y-auto">
           <img src={machine.image} alt={machine.name} className="w-full h-80 object-cover rounded-lg" />
           
-          <div>
-            <h3 className="text-xl font-bold mb-3 text-[#1A1A1A]">Specifications</h3>
-            <div className="bg-gray-50 rounded-lg overflow-hidden">
-              <table className="w-full">
-                <tbody>
-                  {Object.entries(machine.specs).map(([key, value], idx) => (
-                    <tr key={key} className={idx % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
-                      <td className="p-3 font-semibold text-[#1A1A1A]">{key}</td>
-                      <td className="p-3 text-[#BFBFBF]">{value}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+          {machine.description && (
+            <div>
+              <h3 className="text-xl font-bold mb-3 text-[#1A1A1A]">Description</h3>
+              <p className="text-gray-700">{machine.description}</p>
             </div>
-          </div>
+          )}
+
+          {machine.specifications && machine.specifications.length > 0 && (
+            <div>
+              <h3 className="text-xl font-bold mb-3 text-[#1A1A1A]">Specifications</h3>
+              <div className="bg-gray-50 rounded-lg overflow-hidden">
+                <table className="w-full">
+                  <tbody>
+                    {machine.specifications.map((spec, idx) => {
+                      // Split spec by colon if it contains one
+                      const parts = spec.split(':');
+                      const label = parts[0]?.trim() || spec;
+                      const value = parts.length > 1 ? parts.slice(1).join(':').trim() : '';
+                      
+                      return (
+                        <tr key={idx} className={idx % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
+                          <td className="p-3 font-semibold text-[#1A1A1A]">{label}</td>
+                          {value && <td className="p-3 text-[#BFBFBF]">{value}</td>}
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          )}
 
           <div>
             <h3 className="text-xl font-bold mb-3 text-[#1A1A1A]">Hire Rates</h3>
             <div className="grid grid-cols-3 gap-4">
               <div className="bg-gray-50 p-4 rounded-lg text-center">
-                <p className="text-3xl font-bold text-[#EB8B1D]">${(machine as any).dailyRate || (machine as any).rates?.day || 0}</p>
+                <p className="text-3xl font-bold text-[#EB8B1D]">${machine.dailyRate}</p>
                 <p className="text-sm text-[#BFBFBF] mt-1">Per Day</p>
               </div>
               <div className="bg-gray-50 p-4 rounded-lg text-center">
-                <p className="text-3xl font-bold text-[#EB8B1D]">${(machine as any).monthlyRate || (machine as any).rates?.weekend || 0}</p>
-                <p className="text-sm text-[#BFBFBF] mt-1">Monthly</p>
-              </div>
-              <div className="bg-gray-50 p-4 rounded-lg text-center">
-                <p className="text-3xl font-bold text-[#EB8B1D]">${(machine as any).weeklyRate || (machine as any).rates?.week || 0}</p>
+                <p className="text-3xl font-bold text-[#EB8B1D]">${machine.weeklyRate}</p>
                 <p className="text-sm text-[#BFBFBF] mt-1">Per Week</p>
               </div>
+              <div className="bg-gray-50 p-4 rounded-lg text-center">
+                <p className="text-3xl font-bold text-[#EB8B1D]">${machine.monthlyRate}</p>
+                <p className="text-sm text-[#BFBFBF] mt-1">Monthly</p>
+              </div>
             </div>
-            {(machine as any).trailerIncluded && (
-              <p className="mt-3 text-green-600 font-semibold">✓ Trailer Included</p>
-            )}
           </div>
-
 
           <button 
             onClick={onBookNow}

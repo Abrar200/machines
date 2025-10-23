@@ -1,6 +1,5 @@
 import React from 'react';
-import { Category } from '../data/categories';
-
+import { Category } from '../types';
 
 interface CategoryCardProps {
   category: Category;

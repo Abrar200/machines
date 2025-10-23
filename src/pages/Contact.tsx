@@ -32,7 +32,7 @@ const Contact: React.FC = () => {
                 <div className="bg-[#EB8B1D] text-white p-3 rounded-lg">📞</div>
                 <div>
                   <h3 className="font-bold text-lg mb-1">Phone</h3>
-                  <p className="text-gray-700">(08) 8123 4567</p>
+                  <p className="text-gray-700">0414 236 306</p>
                 </div>
               </div>
               <div className="flex items-start gap-4">
@@ -46,14 +46,14 @@ const Contact: React.FC = () => {
                 <div className="bg-[#EB8B1D] text-white p-3 rounded-lg">📍</div>
                 <div>
                   <h3 className="font-bold text-lg mb-1">Location</h3>
-                  <p className="text-gray-700">123 Industrial Drive<br/>Adelaide SA 5000</p>
+                  <p className="text-gray-700">103 Globe Derby Drive<br/>Globe Derby, Adelaide, SA</p>
                 </div>
               </div>
               <div className="flex items-start gap-4">
                 <div className="bg-[#EB8B1D] text-white p-3 rounded-lg">🕒</div>
                 <div>
                   <h3 className="font-bold text-lg mb-1">Hours</h3>
-                  <p className="text-gray-700">Mon-Fri: 7am - 5pm<br/>Sat: 8am - 2pm<br/>Sun: Closed</p>
+                  <p className="text-gray-700">Mon-Fri: 7am - 5pm<br/>Sat & Sun: Closed</p>
                 </div>
               </div>
             </div>

@@ -1,22 +1,32 @@
 export interface Machine {
-  id: string;
+  id: number;
   name: string;
   category: string;
   image: string;
-  images: string[];
-  specs: { [key: string]: string };
-  rates: {
-    day: number;
-    weekend: number;
-    week: number;
-  };
-  trailerIncluded: boolean;
+  dailyRate: number;
+  weeklyRate: number;
+  monthlyRate: number;
+  description: string;
+  specifications: string[];
+  featured?: boolean;
+}
+
+export interface Machinery {
+  id: number;
+  name: string;
+  category: string;
+  image: string;
+  dailyRate: number;
+  weeklyRate: number;
+  monthlyRate: number;
+  description: string;
+  specifications: string[];
   featured?: boolean;
 }
 
 export interface BookingRequest {
   id: string;
-  machineId: string;
+  machineId: number;
   machineName: string;
   customerName: string;
   company?: string;
@@ -36,6 +46,7 @@ export interface BookingRequest {
 export interface Category {
   id: string;
   name: string;
+  description: string;
   image: string;
   count: number;
 }

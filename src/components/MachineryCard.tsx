@@ -29,8 +29,7 @@ export const MachineryCard: React.FC<MachineryCardProps> = ({ machine, onClick }
         <p className="text-[#BFBFBF] text-sm mb-3">{machine.category}</p>
         <div className="flex items-center justify-between">
           <div>
-            <p className="text-2xl font-bold text-[#EB8B1D]">${(machine as any).dailyRate || (machine as any).rates?.day || 0}</p>
-
+            <p className="text-2xl font-bold text-[#EB8B1D]">${machine.dailyRate}</p>
             <p className="text-xs text-[#BFBFBF]">per day</p>
           </div>
           <button className="bg-[#EB8B1D] text-white px-4 py-2 rounded-lg font-semibold hover:bg-[#d67a15] transition-colors">
