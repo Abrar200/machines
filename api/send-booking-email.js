@@ -116,6 +116,9 @@ function formatBookingEmail(booking) {
           opacity: 0.95;
           color: #1A1A1A;
         }
+        .h1 {
+          color: black;
+        }
         .total-cost {
           background: #f9f9f9;
           padding: 20px;
@@ -192,7 +195,7 @@ function formatBookingEmail(booking) {
     <body>
       <div class="container">
         <div class="header">
-          <h1>🚜 New Booking Request</h1>
+          <h1>New Booking Request</h1>
         </div>
         <div class="accent-bar"></div>
         
