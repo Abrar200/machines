@@ -39,7 +39,7 @@ const Contact: React.FC = () => {
                 <div className="bg-[#EB8B1D] text-white p-3 rounded-lg">✉️</div>
                 <div>
                   <h3 className="font-bold text-lg mb-1">Email</h3>
-                  <p className="text-gray-700">hire@elitemachine.com.au</p>
+                  <p className="text-gray-700">info@elitemachinehire.com.au</p>
                 </div>
               </div>
               <div className="flex items-start gap-4">

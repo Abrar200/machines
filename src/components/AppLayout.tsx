@@ -5,26 +5,50 @@ import { CategoryCard } from './CategoryCard';
 import { MachineryCard } from './MachineryCard';
 import { MachineDetailModal } from './MachineDetailModal';
 import { BookingModal } from './BookingModal';
+import { AdminLogin } from './AdminLogin';
 import { AdminDashboard } from './AdminDashboard';
 import { TrustBadges } from './TrustBadges';
 import { BrandCarousel } from './BrandCarousel';
 import { Footer } from './Footer';
 import { supabase } from '../lib/supabase';
 import { Machine, BookingRequest, Category } from '../types';
+import { toast } from 'sonner';
 
 const AppLayout: React.FC = () => {
   const [selectedMachine, setSelectedMachine] = useState<Machine | null>(null);
   const [showMachineDetail, setShowMachineDetail] = useState(false);
   const [showBookingModal, setShowBookingModal] = useState(false);
   const [showAdmin, setShowAdmin] = useState(false);
+  const [isAdminAuthenticated, setIsAdminAuthenticated] = useState(false);
   const [bookings, setBookings] = useState<BookingRequest[]>([]);
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [categories, setCategories] = useState<Category[]>([]);
   const [machinery, setMachinery] = useState<Machine[]>([]);
   const [loading, setLoading] = useState(true);
+  const [bookedDates, setBookedDates] = useState<Record<number, string[]>>({});
   
   const categoriesRef = useRef<HTMLDivElement>(null);
   const hireRef = useRef<HTMLDivElement>(null);
+
+  // Check admin session on mount
+  useEffect(() => {
+    checkAdminSession();
+  }, []);
+
+  const checkAdminSession = async () => {
+    const { data: { session } } = await supabase.auth.getSession();
+    if (session) {
+      const { data: adminCheck } = await supabase
+        .from('admin_users')
+        .select('email')
+        .eq('email', session.user.email)
+        .single();
+      
+      if (adminCheck) {
+        setIsAdminAuthenticated(true);
+      }
+    }
+  };
 
   // Fetch categories from Supabase
   useEffect(() => {
@@ -89,13 +113,14 @@ const AppLayout: React.FC = () => {
     fetchMachinery();
   }, [selectedCategory]);
 
-  // Fetch bookings from Supabase
+  // Fetch bookings and calculate booked dates
   useEffect(() => {
     const fetchBookings = async () => {
       try {
         const { data, error } = await supabase
           .from('bookings')
           .select('*')
+          .in('status', ['pending', 'approved'])
           .order('created_at', { ascending: false });
         
         if (error) throw error;
@@ -121,12 +146,44 @@ const AppLayout: React.FC = () => {
         }));
         
         setBookings(transformedData);
+
+        // Calculate booked dates for each machine
+        const datesByMachine: Record<number, string[]> = {};
+        transformedData.forEach(booking => {
+          if (!datesByMachine[booking.machineId]) {
+            datesByMachine[booking.machineId] = [];
+          }
+          
+          // Get all dates between start and end
+          const start = new Date(booking.startDate);
+          const end = new Date(booking.endDate);
+          const currentDate = new Date(start);
+          
+          while (currentDate <= end) {
+            datesByMachine[booking.machineId].push(currentDate.toISOString().split('T')[0]);
+            currentDate.setDate(currentDate.getDate() + 1);
+          }
+        });
+        
+        setBookedDates(datesByMachine);
       } catch (error) {
         console.error('Error fetching bookings:', error);
       }
     };
 
     fetchBookings();
+
+    // Subscribe to real-time updates
+    const subscription = supabase
+      .channel('bookings_updates')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'bookings' }, () => {
+        fetchBookings();
+      })
+      .subscribe();
+
+    return () => {
+      subscription.unsubscribe();
+    };
   }, []);
 
   const displayedMachinery = machinery;
@@ -143,6 +200,21 @@ const AppLayout: React.FC = () => {
 
   const handleBookingSubmit = async (booking: Omit<BookingRequest, 'id' | 'createdAt' | 'status'>) => {
     try {
+      // Check for date conflicts
+      const machineBookedDates = bookedDates[booking.machineId] || [];
+      const requestedStart = new Date(booking.startDate);
+      const requestedEnd = new Date(booking.endDate);
+      
+      const hasConflict = machineBookedDates.some(bookedDate => {
+        const date = new Date(bookedDate);
+        return date >= requestedStart && date <= requestedEnd;
+      });
+
+      if (hasConflict) {
+        toast.error('This machine is already booked for the selected dates. Please choose different dates.');
+        return;
+      }
+
       // Transform camelCase to snake_case for Supabase
       const bookingData = {
         machine_id: booking.machineId,
@@ -168,7 +240,7 @@ const AppLayout: React.FC = () => {
 
       if (error) throw error;
 
-      // Transform the response back to camelCase
+      // Send email notification
       if (data && data[0]) {
         const newBooking: BookingRequest = {
           id: data[0].id,
@@ -188,31 +260,27 @@ const AppLayout: React.FC = () => {
           totalCost: data[0].total_cost,
           createdAt: data[0].created_at
         };
+
+        // Send email via API
+        try {
+          await fetch('/api/send-booking-email', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(newBooking),
+          });
+        } catch (emailError) {
+          console.error('Error sending email:', emailError);
+          // Don't fail the booking if email fails
+        }
         
         setBookings([newBooking, ...bookings]);
+        toast.success('Booking request submitted! We will contact you shortly.');
       }
-
-      alert('Booking request submitted! We will contact you shortly.');
     } catch (error) {
       console.error('Error submitting booking:', error);
-      alert('There was an error submitting your booking. Please try again.');
-    }
-  };
-
-  const handleUpdateStatus = async (id: string, status: 'approved' | 'declined') => {
-    try {
-      const { error } = await supabase
-        .from('bookings')
-        .update({ status })
-        .eq('id', id);
-
-      if (error) throw error;
-
-      setBookings(bookings.map(b => b.id === id ? { ...b, status } : b));
-      alert(`Booking ${status}! Email notification sent.`);
-    } catch (error) {
-      console.error('Error updating booking status:', error);
-      alert('There was an error updating the booking status.');
+      toast.error('There was an error submitting your booking. Please try again.');
     }
   };
 
@@ -224,21 +292,33 @@ const AppLayout: React.FC = () => {
     setShowBookingModal(true);
   };
 
+  const handleAdminClick = () => {
+    setShowAdmin(true);
+  };
+
+  const handleAdminLoginSuccess = () => {
+    setIsAdminAuthenticated(true);
+  };
+
+  const handleAdminLogout = () => {
+    setIsAdminAuthenticated(false);
+    setShowAdmin(false);
+  };
+
   if (showAdmin) {
+    if (!isAdminAuthenticated) {
+      return <AdminLogin onLoginSuccess={handleAdminLoginSuccess} />;
+    }
     return (
       <div className="min-h-screen bg-gray-50">
-        <Navigation onAdminClick={() => setShowAdmin(false)} />
-        <div className="max-w-7xl mx-auto px-4 py-8">
-          <button onClick={() => setShowAdmin(false)} className="mb-4 text-[#EB8B1D] hover:underline">← Back to Site</button>
-          <AdminDashboard bookings={bookings} onUpdateStatus={handleUpdateStatus} />
-        </div>
+        <AdminDashboard onLogout={handleAdminLogout} />
       </div>
     );
   }
 
   return (
     <div className="min-h-screen bg-white">
-      <Navigation onAdminClick={() => setShowAdmin(true)} />
+      <Navigation onAdminClick={handleAdminClick} />
       <HeroSection onBrowseClick={scrollToCategories} onHireClick={scrollToHire} />
       <TrustBadges />
       <BrandCarousel />
@@ -299,6 +379,7 @@ const AppLayout: React.FC = () => {
         isOpen={showBookingModal}
         onClose={() => setShowBookingModal(false)}
         onSubmit={handleBookingSubmit}
+        bookedDates={selectedMachine ? bookedDates[selectedMachine.id] || [] : []}
       />
     </div>
   );
