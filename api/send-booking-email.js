@@ -39,6 +39,7 @@ function formatBookingEmail(booking) {
           margin: 0;
           font-size: 28px;
           font-weight: 700;
+          color: white;
         }
         .accent-bar {
           height: 4px;
@@ -99,7 +100,7 @@ function formatBookingEmail(booking) {
         }
         .machine-info {
           background: linear-gradient(135deg, #EB8B1D 0%, #FF9D2E 100%);
-          color: white;
+          color: #1A1A1A;
           padding: 25px;
           border-radius: 8px;
           margin: 20px 0;
@@ -108,10 +109,12 @@ function formatBookingEmail(booking) {
         .machine-info h2 {
           margin: 0 0 10px 0;
           font-size: 24px;
+          color: #1A1A1A;
         }
         .machine-info p {
           margin: 5px 0;
           opacity: 0.95;
+          color: #1A1A1A;
         }
         .total-cost {
           background: #f9f9f9;
@@ -171,6 +174,7 @@ function formatBookingEmail(booking) {
         }
         .contact-info p {
           margin: 5px 0;
+          color: #1A1A1A;
         }
         @media only screen and (max-width: 600px) {
           .content {
@@ -193,7 +197,7 @@ function formatBookingEmail(booking) {
         <div class="accent-bar"></div>
         
         <div class="content">
-          <p style="font-size: 16px; margin-bottom: 20px;">
+          <p style="font-size: 16px; margin-bottom: 20px; color: #1A1A1A;">
             A new machinery hire request has been received and is awaiting approval.
           </p>
           

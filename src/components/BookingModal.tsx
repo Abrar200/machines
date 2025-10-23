@@ -59,6 +59,30 @@ export const BookingModal: React.FC<BookingModalProps> = ({ machine, isOpen, onC
     }
   }, [formData.startDate, formData.endDate, bookedDates]);
 
+  // Add CSS to disable booked dates
+  useEffect(() => {
+    if (!isOpen || bookedDates.length === 0) return;
+
+    // Create a style element to disable booked dates
+    const style = document.createElement('style');
+    style.id = 'booked-dates-style';
+    
+    const disabledDatesCSS = bookedDates.map(date => {
+      return `input[type="date"]::-webkit-calendar-picker-indicator { pointer-events: auto; }
+              input[type="date"][value="${date}"] { background-color: #fee; color: #999; }`;
+    }).join('\n');
+    
+    style.textContent = disabledDatesCSS;
+    document.head.appendChild(style);
+
+    return () => {
+      const styleElement = document.getElementById('booked-dates-style');
+      if (styleElement) {
+        styleElement.remove();
+      }
+    };
+  }, [isOpen, bookedDates]);
+
   const validateDates = (start: string, end: string) => {
     const startDate = new Date(start);
     const endDate = new Date(end);
@@ -90,6 +114,20 @@ export const BookingModal: React.FC<BookingModalProps> = ({ machine, isOpen, onC
 
     setDateError('');
     return true;
+  };
+
+  // Function to check if a date is booked
+  const isDateBooked = (dateString: string) => {
+    return bookedDates.includes(dateString);
+  };
+
+  // Handle date input changes with validation
+  const handleDateChange = (field: 'startDate' | 'endDate', value: string) => {
+    if (isDateBooked(value)) {
+      setDateError(`This date is already booked. Please select a different date.`);
+      return;
+    }
+    setFormData({...formData, [field]: value});
   };
 
   if (!isOpen) return null;
@@ -137,10 +175,6 @@ export const BookingModal: React.FC<BookingModalProps> = ({ machine, isOpen, onC
     });
     
     onClose();
-  };
-
-  const isDateBooked = (dateString: string) => {
-    return bookedDates.includes(dateString);
   };
 
   const calculateTotalCost = () => {
@@ -197,7 +231,7 @@ export const BookingModal: React.FC<BookingModalProps> = ({ machine, isOpen, onC
             />
             <input 
               type="email" 
-              placeholder="Email *" 
+placeholder="Email *" 
               required 
               value={formData.email} 
               onChange={e => setFormData({...formData, email: e.target.value})} 
@@ -222,7 +256,7 @@ export const BookingModal: React.FC<BookingModalProps> = ({ machine, isOpen, onC
                 required 
                 min={today}
                 value={formData.startDate} 
-                onChange={e => setFormData({...formData, startDate: e.target.value})} 
+                onChange={e => handleDateChange('startDate', e.target.value)}
                 className={`w-full p-3 border rounded-lg focus:ring-2 focus:ring-[#EB8B1D] focus:border-transparent transition-all ${
                   dateError && formData.startDate ? 'border-red-500' : 'border-gray-300'
                 }`}
@@ -235,7 +269,7 @@ export const BookingModal: React.FC<BookingModalProps> = ({ machine, isOpen, onC
                 required 
                 min={formData.startDate || today}
                 value={formData.endDate} 
-                onChange={e => setFormData({...formData, endDate: e.target.value})} 
+                onChange={e => handleDateChange('endDate', e.target.value)}
                 className={`w-full p-3 border rounded-lg focus:ring-2 focus:ring-[#EB8B1D] focus:border-transparent transition-all ${
                   dateError && formData.endDate ? 'border-red-500' : 'border-gray-300'
                 }`}
