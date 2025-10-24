@@ -1,5 +1,5 @@
 import React from 'react';
-import { Shield, Truck, Award, Headphones } from 'lucide-react';
+import { Shield, Truck, Award, MapPin } from 'lucide-react';
 
 export const TrustBadges: React.FC = () => {
   const badges = [
@@ -25,9 +25,9 @@ export const TrustBadges: React.FC = () => {
       iconColor: 'text-green-600'
     },
     { 
-      Icon: Headphones, 
-      title: '24/7 Support', 
-      description: 'Always here when you need us',
+      Icon: MapPin, 
+      title: 'Adelaide Local', 
+      description: 'Family-owned and operated in Adelaide',
       bgColor: 'bg-purple-50',
       iconColor: 'text-purple-600'
     }

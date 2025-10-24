@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Phone, Mail, MapPin, Clock } from 'lucide-react';
 import { Navigation } from '../components/Navigation';
 import { Footer } from '../components/Footer';
 
@@ -29,28 +30,36 @@ const Contact: React.FC = () => {
             <h2 className="text-3xl font-bold text-[#1A1A1A] mb-6">Get In Touch</h2>
             <div className="space-y-6">
               <div className="flex items-start gap-4">
-                <div className="bg-[#EB8B1D] text-white p-3 rounded-lg">📞</div>
+                <div className="bg-[#EB8B1D] text-white p-3 rounded-lg">
+                  <Phone className="w-6 h-6" />
+                </div>
                 <div>
                   <h3 className="font-bold text-lg mb-1">Phone</h3>
                   <p className="text-gray-700">0414 236 306</p>
                 </div>
               </div>
               <div className="flex items-start gap-4">
-                <div className="bg-[#EB8B1D] text-white p-3 rounded-lg">✉️</div>
+                <div className="bg-[#EB8B1D] text-white p-3 rounded-lg">
+                  <Mail className="w-6 h-6" />
+                </div>
                 <div>
                   <h3 className="font-bold text-lg mb-1">Email</h3>
                   <p className="text-gray-700">info@elitemachinehire.com.au</p>
                 </div>
               </div>
               <div className="flex items-start gap-4">
-                <div className="bg-[#EB8B1D] text-white p-3 rounded-lg">📍</div>
+                <div className="bg-[#EB8B1D] text-white p-3 rounded-lg">
+                  <MapPin className="w-6 h-6" />
+                </div>
                 <div>
                   <h3 className="font-bold text-lg mb-1">Location</h3>
                   <p className="text-gray-700">103 Globe Derby Drive<br/>Globe Derby, Adelaide, SA</p>
                 </div>
               </div>
               <div className="flex items-start gap-4">
-                <div className="bg-[#EB8B1D] text-white p-3 rounded-lg">🕒</div>
+                <div className="bg-[#EB8B1D] text-white p-3 rounded-lg">
+                  <Clock className="w-6 h-6" />
+                </div>
                 <div>
                   <h3 className="font-bold text-lg mb-1">Hours</h3>
                   <p className="text-gray-700">Mon-Fri: 7am - 5pm<br/>Sat & Sun: Closed</p>
